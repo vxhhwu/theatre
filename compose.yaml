@@ -1,0 +1,46 @@
+services:
+  theatre-db:
+    image: postgres:16
+    container_name: theatre-db
+    restart: always
+    environment:
+      POSTGRES_DB: theatre
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  theatre-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: theatre-app
+    restart: always
+    depends_on:
+      - theatre-db
+    volumes:
+      - static_volume:/app/static
+    environment:
+      DB_NAME: theatre
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_HOST: theatre-db
+      DB_PORT: 5432
+
+  theatre-nginx:
+    image: nginx:latest
+    container_name: theatre-nginx
+    restart: always
+    depends_on:
+      - theatre-app
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - static_volume:/app/static
+
+volumes:
+  postgres_data:
+  static_volume:
