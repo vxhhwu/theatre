@@ -1,0 +1,5 @@
+Django>=5.0
+uwsgi
+psycopg2[binary]
+uuid
+python-dotenv
